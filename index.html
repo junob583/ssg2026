@@ -1,0 +1,1813 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>신세계리테일랩 - 프로모션 현장 실행 점검 시스템</title>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      /* Shinsegae Theme Palette */
+      --primary: #7A1B28;        /* Shinsegae Deep Burgundy */
+      --primary-hover: #5d141e;
+      --primary-light: #fdf2f4;
+      --secondary: #1E293B;      /* Dark Slate */
+      --accent: #D4AF37;         /* Warm Gold */
+      --accent-hover: #b89628;
+      
+      /* Status Colors */
+      --status-completed: #10B981; /* Emerald Green */
+      --status-progress: #F59E0B;  /* Amber Yellow */
+      --status-pending: #9CA3AF;   /* Slate Gray */
+      --status-danger: #EF4444;    /* Crimson Red */
+
+      /* Light Theme Defaults */
+      --bg-body: #F8FAFC;
+      --bg-card: rgba(255, 255, 255, 0.9);
+      --bg-card-border: rgba(226, 232, 240, 0.8);
+      --text-main: #0F172A;
+      --text-muted: #64748B;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+      --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+      --header-bg: #7A1B28;
+      --header-text: #FFFFFF;
+      --input-bg: #FFFFFF;
+      --input-border: #CBD5E1;
+    }
+
+    [data-theme="dark"] {
+      --bg-body: #0F172A;
+      --bg-card: rgba(30, 41, 59, 0.85);
+      --bg-card-border: rgba(51, 65, 85, 0.8);
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+      --header-bg: #111827;
+      --header-text: #F8FAFC;
+      --input-bg: #1E293B;
+      --input-border: #475569;
+      --primary-light: rgba(122, 27, 40, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+    }
+
+    body {
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding-bottom: 80px;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    /* Header */
+    header {
+      background-color: var(--header-bg);
+      color: var(--header-text);
+      padding: 16px 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      background: var(--accent);
+      color: #1E293B;
+      font-weight: 800;
+      font-size: 1.1rem;
+      padding: 6px 12px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .d-day-badge {
+      background-color: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #FFF;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .icon-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .icon-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    /* Meta Info Banner */
+    .meta-banner {
+      background: linear-gradient(135deg, var(--primary) 0%, #4A1019 100%);
+      color: white;
+      margin: 16px 0;
+      padding: 16px 20px;
+      border-radius: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .meta-info-list {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      font-size: 0.9rem;
+    }
+
+    .meta-info-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      opacity: 0.95;
+    }
+
+    .meta-info-item strong {
+      color: var(--accent);
+    }
+
+    /* KPI Dashboard */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--bg-card-border);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .kpi-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .kpi-value {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .progress-bar-bg {
+      background-color: var(--input-border);
+      height: 10px;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 5px;
+      transition: width 0.5s ease-in-out;
+    }
+
+    .status-counts {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+
+    .status-completed-bg { background-color: rgba(16, 185, 129, 0.15); color: var(--status-completed); }
+    .status-progress-bg { background-color: rgba(245, 158, 11, 0.15); color: var(--status-progress); }
+    .status-pending-bg { background-color: rgba(156, 163, 175, 0.15); color: var(--status-pending); }
+
+    .store-progress-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .store-progress-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.85rem;
+    }
+
+    .store-bar-bg {
+      width: 50%;
+      background-color: var(--input-border);
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    /* Risk Banner */
+    .risk-banner {
+      background: linear-gradient(90deg, rgba(239, 68, 68, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .risk-banner-text {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .risk-icon {
+      background: var(--status-danger);
+      color: white;
+      padding: 8px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+    .btn-primary:hover { background-color: var(--primary-hover); }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--input-border);
+      color: var(--text-main);
+    }
+    .btn-outline:hover { background: var(--primary-light); }
+
+    .btn-accent {
+      background-color: var(--accent);
+      color: #1E293B;
+    }
+    .btn-accent:hover { background-color: var(--accent-hover); }
+
+    /* Controls Bar (Search & Filter) */
+    .controls-card {
+      background: var(--bg-card);
+      border: 1px solid var(--bg-card-border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      align-items: center;
+    }
+
+    .select-control, .input-control {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--input-border);
+      background-color: var(--input-bg);
+      color: var(--text-main);
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .select-control:focus, .input-control:focus {
+      border-color: var(--primary);
+    }
+
+    .search-wrapper {
+      position: relative;
+    }
+
+    .search-wrapper i {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      width: 16px;
+    }
+
+    .search-wrapper input {
+      padding-left: 34px;
+    }
+
+    /* Checklist Section */
+    .category-block {
+      margin-bottom: 24px;
+    }
+
+    .category-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: var(--primary-light);
+      border-left: 5px solid var(--primary);
+      border-radius: 8px;
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    .category-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-main);
+      font-size: 1.05rem;
+    }
+
+    .category-progress {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .checklist-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    /* Checklist Item Card */
+    .item-card {
+      background: var(--bg-card);
+      border: 1px solid var(--bg-card-border);
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      position: relative;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .item-card:hover {
+      box-shadow: var(--shadow-hover);
+    }
+
+    .item-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .item-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .item-no {
+      background: var(--primary);
+      color: white;
+      font-weight: 700;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+
+    .item-dept {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      background: rgba(0,0,0,0.05);
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+
+    .item-deadline {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .item-status-btn {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .item-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--text-main);
+    }
+
+    .item-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      white-space: pre-line;
+      line-height: 1.4;
+    }
+
+    /* Store Checkboxes */
+    .store-checks {
+      display: flex;
+      gap: 16px;
+      background: rgba(0,0,0,0.02);
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px dashed var(--input-border);
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .store-check-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .store-check-label input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    /* Memo Section */
+    .memo-wrapper {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .memo-input {
+      flex: 1;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+      border-radius: 6px;
+      border: 1px solid var(--input-border);
+      background-color: var(--input-bg);
+      color: var(--text-main);
+    }
+
+    .item-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .item-actions-right {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Bottom Action Bar */
+    .action-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--bg-card);
+      border-top: 1px solid var(--bg-card-border);
+      padding: 12px 24px;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 90;
+      backdrop-filter: blur(10px);
+    }
+
+    .action-bar-left, .action-bar-right {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    /* Modal Overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--bg-card-border);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 650px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--bg-card-border);
+      padding-bottom: 12px;
+    }
+
+    .modal-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--primary);
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .prohibition-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .prohibition-item {
+      background: rgba(239, 68, 68, 0.08);
+      border-left: 4px solid var(--status-danger);
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+
+    .prohibition-item strong {
+      color: var(--status-danger);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    /* Tabs inside Modal */
+    .tab-nav {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--input-border);
+      margin-bottom: 16px;
+    }
+
+    .tab-btn {
+      padding: 8px 16px;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        background: white !important;
+        color: black !important;
+        padding-bottom: 0;
+      }
+      header, .action-bar, .controls-card, .risk-banner, .icon-btn, .btn, .memo-wrapper button {
+        display: none !important;
+      }
+      .container {
+        max-width: 100% !important;
+        padding: 0 !important;
+      }
+      .item-card {
+        border: 1px solid #ccc !important;
+        box-shadow: none !important;
+        break-inside: avoid;
+        margin-bottom: 12px;
+      }
+      .kpi-card {
+        border: 1px solid #aaa !important;
+        box-shadow: none !important;
+      }
+      .store-checks {
+        border: 1px solid #ddd !important;
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header-inner { flex-direction: column; align-items: flex-start; }
+      .meta-banner { flex-direction: column; align-items: flex-start; }
+      .action-bar { flex-direction: column; gap: 8px; }
+      .action-bar-left, .action-bar-right { width: 100%; justify-content: space-between; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="container header-inner">
+      <div class="brand">
+        <span class="brand-logo">SHINSEGAE</span>
+        <div class="brand-title">리테일랩 현장 실행 점검 시스템</div>
+      </div>
+      <div class="header-actions">
+        <div class="d-day-badge" id="dDayBadge">
+          <i data-lucide="calendar"></i> D-17 [행사 09.04 오픈]
+        </div>
+        <button class="icon-btn" id="themeToggleBtn" title="화면 테마 변경">
+          <i data-lucide="moon"></i> <span id="themeBtnText">다크</span>
+        </button>
+        <button class="icon-btn" id="backupBtn" title="데이터 백업">
+          <i data-lucide="download"></i> 백업
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container" style="margin-top: 16px;">
+    
+    <!-- Meta Info Banner -->
+    <div class="meta-banner">
+      <div class="meta-info-list">
+        <div class="meta-info-item">
+          <i data-lucide="tag"></i> 행사: <strong>냉장 간편식 주력 6종 (2개 이상 10% 할인)</strong>
+        </div>
+        <div class="meta-info-item">
+          <i data-lucide="clock"></i> 기간: <strong>2026.09.04 ~ 2026.09.10</strong>
+        </div>
+        <div class="meta-info-item">
+          <i data-lucide="map-pin"></i> 점포: <strong>센트럴점 / 리버점 / 파크점</strong>
+        </div>
+      </div>
+      <button class="btn btn-accent" id="openRiskModalBtn">
+        <i data-lucide="shield-alert"></i> 4대 금지사항 & 지침
+      </button>
+    </div>
+
+    <!-- Dashboard KPI Cards -->
+    <div class="dashboard-grid">
+      <!-- Total Progress Card -->
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title"><i data-lucide="check-circle-2"></i> 종합 실행 진행률</span>
+          <span class="kpi-value" id="totalProgressPercent">0%</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="totalProgressBar" style="width: 0%; background-color: var(--primary);"></div>
+        </div>
+        <div class="status-counts">
+          <span class="status-badge status-completed-bg"><i data-lucide="check"></i> 완료 <strong id="countCompleted">0</strong></span>
+          <span class="status-badge status-progress-bg"><i data-lucide="clock"></i> 진행중 <strong id="countProgress">0</strong></span>
+          <span class="status-badge status-pending-bg"><i data-lucide="minus"></i> 대기 <strong id="countPending">0</strong></span>
+          <span style="margin-left: auto; color: var(--text-muted);">총 <strong id="countTotal">14</strong>건</span>
+        </div>
+      </div>
+
+      <!-- Store Breakdown Card -->
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title"><i data-lucide="store"></i> 점포별 완료 진척도</span>
+        </div>
+        <div class="store-progress-list">
+          <div class="store-progress-item">
+            <span>센트럴점</span>
+            <div class="store-bar-bg">
+              <div class="progress-bar-fill" id="centralBar" style="width: 0%; background-color: var(--status-completed);"></div>
+            </div>
+            <strong id="centralPercent">0%</strong>
+          </div>
+          <div class="store-progress-item">
+            <span>리버점</span>
+            <div class="store-bar-bg">
+              <div class="progress-bar-fill" id="riverBar" style="width: 0%; background-color: var(--status-completed);"></div>
+            </div>
+            <strong id="riverPercent">0%</strong>
+          </div>
+          <div class="store-progress-item">
+            <span>파크점</span>
+            <div class="store-bar-bg">
+              <div class="progress-bar-fill" id="parkBar" style="width: 0%; background-color: var(--status-completed);"></div>
+            </div>
+            <strong id="parkPercent">0%</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Budget Monitoring Card -->
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title"><i data-lucide="pie-chart"></i> 프로모션 예산 소진 모니터링</span>
+          <span style="font-size: 0.8rem; font-weight: bold; color: var(--status-danger);" id="budgetAlertBadge">주의 (80% 기준)</span>
+        </div>
+        <div style="font-size: 1.3rem; font-weight: 800; margin-bottom: 4px;">
+          <span id="budgetSpentText">4,800,000</span>원 <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: normal;">/ 8,000,000원</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="budgetProgressBar" style="width: 60%; background-color: var(--status-progress);"></div>
+        </div>
+        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px;">
+          할인 보전 예상액 기준 80%(480만원) 도달 시 마케팅팀 자동 알림 체계
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls Bar -->
+    <div class="controls-card">
+      <div class="controls-grid">
+        <div class="search-wrapper">
+          <i data-lucide="search"></i>
+          <input type="text" id="searchInput" class="input-control" placeholder="점검 항목, 내용, 부서 검색...">
+        </div>
+        <select id="storeFilter" class="select-control">
+          <option value="all">전체 점포 보기</option>
+          <option value="central">센트럴점 기준</option>
+          <option value="river">리버점 기준</option>
+          <option value="park">파크점 기준</option>
+        </select>
+        <select id="categoryFilter" class="select-control">
+          <option value="all">전체 분야 보기</option>
+          <option value="VMD">1. VMD 및 진열</option>
+          <option value="SCM">2. SCM 및 재고</option>
+          <option value="POS">3. POS 및 예산</option>
+          <option value="CS">4. 인력 및 CS</option>
+        </select>
+        <select id="statusFilter" class="select-control">
+          <option value="all">전체 상태 보기</option>
+          <option value="completed">완료 (🟢)</option>
+          <option value="in_progress">진행중 (🟡)</option>
+          <option value="pending">대기 (⚪)</option>
+        </select>
+        <button class="btn btn-primary" id="addItemBtn">
+          <i data-lucide="plus"></i> 항목 추가
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Checklist Container -->
+    <div id="checklistContainer">
+      <!-- Dynamic Categories & Items Rendered via JS -->
+    </div>
+
+  </div>
+
+  <!-- Bottom Action Bar -->
+  <div class="action-bar">
+    <div class="action-bar-left">
+      <button class="btn btn-outline" id="printBtn"><i data-lucide="printer"></i> 인쇄 / PDF 출력</button>
+      <button class="btn btn-outline" id="exportJsonBtn"><i data-lucide="file-json"></i> JSON 내보내기</button>
+      <label class="btn btn-outline" style="cursor: pointer;">
+        <i data-lucide="upload"></i> JSON 불러오기
+        <input type="file" id="importJsonInput" accept=".json" style="display: none;">
+      </label>
+    </div>
+    <div class="action-bar-right">
+      <button class="btn btn-outline" id="resetDataBtn" style="color: var(--status-danger); border-color: rgba(239, 68, 68, 0.4);">
+        <i data-lucide="rotate-ccw"></i> 데이터 초기화
+      </button>
+    </div>
+  </div>
+
+  <!-- Risk & Escalation Modal -->
+  <div class="modal-overlay" id="riskModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title"><i data-lucide="shield-alert"></i> 위험 관리 & 컴플라이언스 허브</div>
+        <button class="close-btn" id="closeRiskModalBtn">&times;</button>
+      </div>
+
+      <div class="tab-nav">
+        <button class="tab-btn active" data-tab="tab-prohibition">4대 절대 금지 사항</button>
+        <button class="tab-btn" data-tab="tab-escalation">긴급 대응 프로토콜</button>
+        <button class="tab-btn" data-tab="tab-roadmap">D-Day 로드맵</button>
+      </div>
+
+      <!-- Tab 1: 4대 절대 금지 사항 -->
+      <div id="tab-prohibition" class="tab-content">
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">
+          현장 관리자는 프로모션 기간 동안 아래 4대 금지 사항을 철저히 준수해야 합니다.
+        </p>
+        <div class="prohibition-list">
+          <div class="prohibition-item">
+            <strong>1. 가격 임의 변경 절대 불가</strong>
+            POS 등록 가격 및 본사 승인 할인율 외 매장 단위 임의 가격 수정/수기 수령 금지.
+          </div>
+          <div class="prohibition-item">
+            <strong>2. 고객 보상 임의 약속 금지</strong>
+            품절 및 시스템 오류 시 현장 임의 유기적 보상 제공 금지, 표준 VOC 이관 절차 준수.
+          </div>
+          <div class="prohibition-item">
+            <strong>3. 비인가 외부 메일/문서 발송 금지</strong>
+            행사 실적 및 재고 현황 등 내부 데이터의 외부 개인 이메일 전송 차단.
+          </div>
+          <div class="prohibition-item">
+            <strong>4. 정산 파일 및 POS 로그 무단 삭제 금지</strong>
+            매출 정산 문서 및 예산 사용 기록의 현장 무단 삭제 엄금.
+          </div>
+        </div>
+
+        <div style="background: var(--primary-light); padding: 12px; border-radius: 8px; margin-top: 16px;">
+          <label style="display: flex; align-items: center; gap: 8px; font-weight: bold; cursor: pointer;">
+            <input type="checkbox" id="complianceCheck" style="width: 18px; height: 18px; accent-color: var(--primary);">
+            위 4대 절대 금지 사항을 숙지하였으며 점포 현장 실행 시 준수할 것을 서약합니다.
+          </label>
+        </div>
+      </div>
+
+      <!-- Tab 2: 긴급 대응 프로토콜 -->
+      <div id="tab-escalation" class="tab-content" style="display: none;">
+        <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.88rem;">
+          <div style="border: 1px solid var(--input-border); padding: 12px; border-radius: 8px;">
+            <strong style="color: var(--primary); display: block; margin-bottom: 4px;">🚨 품절 임박 상황 (재고 15% 이하)</strong>
+            1차: 진열 페이스업 조정 ➔ 2차: 14시 입고 차량 타임테이블 안내 ➔ 3차: 인근 점포 간 수평 이동 요청(Hotline)
+          </div>
+          <div style="border: 1px solid var(--input-border); padding: 12px; border-radius: 8px;">
+            <strong style="color: var(--primary); display: block; margin-bottom: 4px;">💻 POS 할인 불응/오류 발생 시</strong>
+            1차: IT 헬프데스크 즉시 호출 ➔ 2차: 임의 수기 할인 금지 ➔ 3차: 안내데스크 예약 접수증 발행
+          </div>
+          <div style="border: 1px solid var(--input-border); padding: 12px; border-radius: 8px;">
+            <strong style="color: var(--primary); display: block; margin-bottom: 4px;">💰 예산 80% 조기 소진 시 (480만원 경보)</strong>
+            1차: 마케팅팀 담당자 직통 보고 ➔ 2차: 점포별 추가 예산 배정 요청 또는 프로모션 조기 마감 공지 준비
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: D-Day 로드맵 -->
+      <div id="tab-roadmap" class="tab-content" style="display: none;">
+        <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.85rem;">
+          <div style="padding: 8px 12px; background: rgba(0,0,0,0.03); border-radius: 6px;">
+            <strong>D-16 ~ D-10</strong>: VMD 위치 확정 및 협력사 일일 캐파 확약 완료
+          </div>
+          <div style="padding: 8px 12px; background: rgba(0,0,0,0.03); border-radius: 6px;">
+            <strong>D-9 ~ D-4</strong>: POS 번들 할인 테스트, POP 배포, 피크타임 인력 편성
+          </div>
+          <div style="padding: 8px 12px; background: var(--primary-light); border-radius: 6px; font-weight: bold;">
+            <strong>D-3 ~ D-1</strong>: 쇼케이스 온도 점검(0~5℃), 직원 교육, 최종 점검
+          </div>
+          <div style="padding: 8px 12px; background: rgba(16, 185, 129, 0.1); border-radius: 6px; color: var(--status-completed);">
+            <strong>D-Day ~ D+6 (09.04 ~ 09.10)</strong>: 프로모션 오픈 & 실시간 모니터링
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 20px; text-align: right;">
+        <button class="btn btn-primary" id="saveComplianceBtn">확인 완료</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Item Modal -->
+  <div class="modal-overlay" id="itemModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title" id="itemModalTitle"><i data-lucide="plus-circle"></i> 점검 항목 추가</div>
+        <button class="close-btn" id="closeItemModalBtn">&times;</button>
+      </div>
+      <form id="itemForm">
+        <input type="hidden" id="editItemId">
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <div>
+            <label style="font-size: 0.85rem; font-weight: bold;">분야 선택</label>
+            <select id="formCategory" class="select-control" required style="margin-top: 4px;">
+              <option value="VMD">점포별 진열 위치 및 VMD 부문</option>
+              <option value="SCM">협력사 공급망(SCM) 및 재고 부문</option>
+              <option value="POS">POS 시스템 및 예산 관리 부문</option>
+              <option value="CS">직원 배치 및 교육 / 고객 FAQ 부문</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size: 0.85rem; font-weight: bold;">항목명</label>
+            <input type="text" id="formTitle" class="input-control" required placeholder="예: 현장 판촉물 배포 점검" style="margin-top: 4px;">
+          </div>
+          <div>
+            <label style="font-size: 0.85rem; font-weight: bold;">세부 내용 및 지침</label>
+            <textarea id="formDescription" class="input-control" rows="3" placeholder="점검 세부 가이드라인 작성..." style="margin-top: 4px; resize: vertical;"></textarea>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div>
+              <label style="font-size: 0.85rem; font-weight: bold;">담당 부서</label>
+              <input type="text" id="formDepartment" class="input-control" placeholder="예: 점포운영팀" style="margin-top: 4px;">
+            </div>
+            <div>
+              <label style="font-size: 0.85rem; font-weight: bold;">완료 목표 기한</label>
+              <input type="date" id="formDeadline" class="input-control" style="margin-top: 4px;">
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: 20px; text-align: right; display: flex; gap: 8px; justify-content: flex-end;">
+          <button type="button" class="btn btn-outline" id="cancelItemBtn">취소</button>
+          <button type="submit" class="btn btn-primary">저장하기</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JavaScript App Logic -->
+  <script>
+    // Initial Standard 14 Checklist Items Data
+    const DEFAULT_ITEMS = [
+      {
+        id: "CHK-001",
+        category: "VMD",
+        categoryName: "점포별 진열 위치 및 VMD 부문",
+        no: 1,
+        title: "점포별 매대 위치 확정",
+        description: "- 센트럴점: 메인 아일랜드 1개 전면\n- 리버점: 델리 전면 엔드캡\n- 파크점: 오픈 쇼케이스 골든존",
+        department: "점포운영팀 / 점포 매장장",
+        deadline: "2026-08-26",
+        status: "in_progress",
+        storeStatus: { central: true, river: false, park: false },
+        memo: "센트럴점 매대 배치 완료, 리버점 매대 조정 중",
+        updatedAt: "2026-08-18T14:50:00.000Z",
+        isCustom: false
+      },
+      {
+        id: "CHK-002",
+        category: "VMD",
+        categoryName: "점포별 진열 위치 및 VMD 부문",
+        no: 2,
+        title: "쇼케이스 냉각 성능 점검",
+        description: "- 쇼케이스 내부 온도 센서(0℃~5℃) 정상 가동 상태 확인\n- 최대 적재 한계선(Load Line) 준수 스티커 부착",
+        department: "시설관리팀 / 점포 매장장",
+        deadline: "2026-08-27",
+        status: "pending",
+        storeStatus: { central: true, river: false, park: false },
+        memo: "",
+        updatedAt: "2026-08-18T10:00:00.000Z",
+        isCustom: false
+      },
+      {
+        id: "CHK-003",
+        category: "VMD",
+        categoryName: "점포별 진열 위치 및 VMD 부문",
+        no: 3,
+        title: "가격표 및 POP물 제작·배포",
+        description: "- 행사 전용 표준 가격표 6종 입고 확인\n- 2개 이상 10% 할인 스팟 POP 및 와블러 매대 설치",
+        department: "마케팅 VMD팀",
+        deadline: "2026-09-02",
+        status: "completed",
+        storeStatus: { central: true, river: true, park: true },
+        memo: "3개 점포 인쇄물 배포 완료",
+        updatedAt: "2026-08-17T16:20:00.000Z",
+        isCustom: false
+      },
+      {
+        id: "CHK-004",
+        category: "SCM",
+        categoryName: "협력사 공급망(SCM) 및 재고 부문",
+        no: 4,
+        title: "협력사 일일 최대 캐파 확약",
+        description: "- 냉장 간편식 주력 6종 협력사 일일 최대 생산 캐파 점검\n- 평시 대비 +200% 물량 공급 서면 확약",
+        department: "SCM 구매팀",
+        deadline: "2026-08-25",
+        status: "completed",
+        storeStatus: { central: true, river: true, park: true },
+        memo: "협력사 3곳 모두 공급 확약서 접수됨",
+        updatedAt: "2026-08-15T11:00:00.000Z",
+        isCustom: false
+      },
+      {
+        id: "CHK-005",
+        category: "SCM",
+        categoryName: "협력사 공급망(SCM) 및 재고 부문",
+        no: 5,
+        title: "분할 배송 타임테이블 확정",
+        description: "- 일 2회 분할 배송 시간 확정 (1차 07:00 / 2차 14:00)\n- 입고 피크시간대 물류 차량 간섭 최소화",
+        department: "물류운영팀",
+        deadline: "2026-08-28",
+        status: "in_progress",
+        storeStatus: { central: true, river: true, park: false },
+        memo: "파크점 물류 동선 검토 중",
+        updatedAt: "2026-08-18T09:30:00.000Z",
+        isCustom: false
+      },
+      {
+        id: "CHK-006",
+        category: "SCM",
+        categoryName: "협력사 공급망(SCM) 및 재고 부문",
+        no: 6,
+        title: "안전재고(Safety Stock) 설정",
+        description: "- 점포별 일일 예상 판매량의 30% 수준 안전재고 설정\n- 유통기한 관리(FIFO) 수립",
+        department: "점포 재고관리팀",
+        deadline: "2026-08-30",
+        status: "pending",
+        storeStatus: { central: false, river: false, park: false },
+        memo: "",
+        updatedAt: "2026-08-18T10:00:00.000Z",
+        isCustom: false
+      },
+      {
+        id: "CHK-007",
+        category: "SCM",
+        categoryName: "협력사 공급망(SCM) 및 재고 부문",
+        no: 7,
+        title: "품절 비상 연락망(Hotline) 구축",
+        description: "- 품절 임박 시 3개 점포 간 재고 이동 수평 프로세스 마련\n- 물류센터 비상 발주 비상 소통 채널 구축",
+        department: "SCM운영팀",
+        deadline: "2026-09-01",
+        status: "completed",
+        storeStatus: { central: true, river: true, park: true },
+        memo: "비상 카톡방 및 콜센터 구축 완료",
+        updatedAt: "2026-08-16T15:00:00.000Z",
+        isCustom: false
+      },
+      {
+        id: "CHK-008",
+        category: "POS",
+        categoryName: "POS 시스템 및 예산 관리 부문",
+        no: 8,
+        title: "POS 번들 할인 로직 테스트",
+        description: "- 냉장 간편식 6종 중 교차 2개 이상 구매 시 10% 자동 할인 검증\n- 바코드 스캔 테스트 사전 수행",
+        department: "IT 시스템운영팀",
+        deadline: "2026-08-29",
+        status: "in_progress",
+        storeStatus: { central: true, river: false, park: false },
+        memo: "센트럴점 POS 1차 테스트 통과",
+        updatedAt: "2026-08-18T13:00:00.000Z",
+        isCustom: false
+      },
+      {
+        id: "CHK-009",
+        category: "POS",
+        categoryName: "POS 시스템 및 예산 관리 부문",
+        no: 9,
+        title: "중복 할인 적용 규칙 정립",
+        description: "- 신세계 제휴카드 추가 할인 및 쿠폰 중복 적용 허용 범위 설정\n- POS 내 중복 할인 에러 방지 처리",
+        department: "IT기획팀 / 마케팅팀",
+        deadline: "2026-08-31",
+        status: "completed",
+        storeStatus: { central: true, river: true, park: true },
+        memo: "쿠폰 중복 불가, 카드 청구할인 중복 가능 로직 확정",
+        updatedAt: "2026-08-14T17:00:00.000Z",
+        isCustom: false
+      },
+      {
+        id: "CHK-010",
+        category: "POS",
+        categoryName: "POS 시스템 및 예산 관리 부문",
+        no: 10,
+        title: "예산 소진 실시간 모니터링",
+        description: "- 총 예산 8,000,000원 중 80%(4,800,000원) 도달 시 Alert 모니터링\n- 일일 정산 보고서 수신 설정",
+        department: "재무운영팀 / 마케팅팀",
+        deadline: "2026-09-03",
+        status: "pending",
+        storeStatus: { central: false, river: false, park: false },
+        memo: "",
+        updatedAt: "2026-08-18T10:00:00.000Z",
+        isCustom: false
+      },
+      {
+        id: "CHK-011",
+        category: "CS",
+        categoryName: "직원 배치 및 교육 / 고객 FAQ 부문",
+        no: 11,
+        title: "피크타임 전담 인력 편성",
+        description: "- 점심(11:30~13:30) 및 저녁(17:30~20:00) 매대 지원 인력 배치\n- 단기 행사 지원 인원 사전 채용 완료",
+        department: "점포 인사팀 / 매장장",
+        deadline: "2026-09-01",
+        status: "in_progress",
+        storeStatus: { central: true, river: true, park: false },
+        memo: "파크점 지원 인력 스케줄링 진행 중",
+        updatedAt: "2026-08-18T11:20:00.000Z",
+        isCustom: false
+      },
+      {
+        id: "CHK-012",
+        category: "CS",
+        categoryName: "직원 배치 및 교육 / 고객 FAQ 부문",
+        no: 12,
+        title: "직원 응대 스크립트 교육",
+        description: "- 교차 2개 이상 할인 조건 안내 스크립트 배포\n- 영수증 내 할인 내역 확인 안내 교육 실시",
+        department: "CS 교육팀",
+        deadline: "2026-09-02",
+        status: "pending",
+        storeStatus: { central: false, river: false, park: false },
+        memo: "스크립트 초안 작성 완료",
+        updatedAt: "2026-08-18T10:00:00.000Z",
+        isCustom: false
+      },
+      {
+        id: "CHK-013",
+        category: "CS",
+        categoryName: "직원 배치 및 교육 / 고객 FAQ 부문",
+        no: 13,
+        title: "표준 고객 FAQ 배포",
+        description: "- '행사 상품 교환/환불 기준' 및 '사전 예약 불가' 등 자주 묻는 질문 FAQ 매부 부착",
+        department: "CS 운영팀",
+        deadline: "2026-09-03",
+        status: "completed",
+        storeStatus: { central: true, river: true, park: true },
+        memo: "고객만족센터 및 안내데스크 배포 완료",
+        updatedAt: "2026-08-17T09:00:00.000Z",
+        isCustom: false
+      },
+      {
+        id: "CHK-014",
+        category: "CS",
+        categoryName: "직원 배치 및 교육 / 고객 FAQ 부문",
+        no: 14,
+        title: "4대 금지 사항 서약 및 준수",
+        description: "- 가격 임의 변경, 고객 보상 임의 약속 등 4대 절대 금지 사항 점포 관리자 서약 완료",
+        department: "준법지원팀 / 점포 매장장",
+        deadline: "2026-09-03",
+        status: "in_progress",
+        storeStatus: { central: true, river: false, park: true },
+        memo: "리버점 서약 진행 예정",
+        updatedAt: "2026-08-18T14:00:00.000Z",
+        isCustom: false
+      }
+    ];
+
+    // App State Management
+    class AppStore {
+      constructor() {
+        this.STORAGE_KEY = "shinsegae_retail_lab_checklist_v1";
+        this.state = this.loadState();
+      }
+
+      loadState() {
+        const saved = localStorage.getItem(this.STORAGE_KEY);
+        if (saved) {
+          try {
+            return JSON.parse(saved);
+          } catch (e) {
+            console.error("Failed to parse stored state", e);
+          }
+        }
+        return {
+          version: "1.0.0",
+          theme: "light",
+          complianceAgreed: false,
+          budgetSpent: 4800000,
+          items: [...DEFAULT_ITEMS]
+        };
+      }
+
+      saveState() {
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.state));
+      }
+
+      getItems() {
+        return this.state.items;
+      }
+
+      updateItem(id, updatedFields) {
+        const idx = this.state.items.findIndex(item => item.id === id);
+        if (idx !== -1) {
+          this.state.items[idx] = {
+            ...this.state.items[idx],
+            ...updatedFields,
+            updatedAt: new Date().toISOString()
+          };
+          this.saveState();
+        }
+      }
+
+      addItem(newItem) {
+        this.state.items.push(newItem);
+        this.saveState();
+      }
+
+      deleteItem(id) {
+        this.state.items = this.state.items.filter(item => item.id !== id);
+        this.saveState();
+      }
+
+      resetToDefault() {
+        this.state.items = [...DEFAULT_ITEMS];
+        this.saveState();
+      }
+
+      setTheme(theme) {
+        this.state.theme = theme;
+        this.saveState();
+      }
+
+      setCompliance(agreed) {
+        this.state.complianceAgreed = agreed;
+        this.saveState();
+      }
+    }
+
+    const store = new AppStore();
+
+    // UI Controller
+    document.addEventListener("DOMContentLoaded", () => {
+      // Initialize Lucide Icons
+      lucide.createIcons();
+
+      // DOM Elements
+      const themeToggleBtn = document.getElementById("themeToggleBtn");
+      const themeBtnText = document.getElementById("themeBtnText");
+      const checklistContainer = document.getElementById("checklistContainer");
+      const searchInput = document.getElementById("searchInput");
+      const storeFilter = document.getElementById("storeFilter");
+      const categoryFilter = document.getElementById("categoryFilter");
+      const statusFilter = document.getElementById("statusFilter");
+
+      // Modals & Buttons
+      const riskModal = document.getElementById("riskModal");
+      const openRiskModalBtn = document.getElementById("openRiskModalBtn");
+      const closeRiskModalBtn = document.getElementById("closeRiskModalBtn");
+      const saveComplianceBtn = document.getElementById("saveComplianceBtn");
+      const complianceCheck = document.getElementById("complianceCheck");
+
+      const itemModal = document.getElementById("itemModal");
+      const addItemBtn = document.getElementById("addItemBtn");
+      const closeItemModalBtn = document.getElementById("closeItemModalBtn");
+      const cancelItemBtn = document.getElementById("cancelItemBtn");
+      const itemForm = document.getElementById("itemForm");
+
+      const printBtn = document.getElementById("printBtn");
+      const exportJsonBtn = document.getElementById("exportJsonBtn");
+      const importJsonInput = document.getElementById("importJsonInput");
+      const resetDataBtn = document.getElementById("resetDataBtn");
+      const backupBtn = document.getElementById("backupBtn");
+
+      // Apply initial theme
+      if (store.state.theme === "dark") {
+        document.documentElement.setAttribute("data-theme", "dark");
+        themeBtnText.textContent = "라이트";
+      }
+
+      // Render Everything Initial
+      renderDDay();
+      renderDashboard();
+      renderChecklist();
+
+      // Theme Switch
+      themeToggleBtn.addEventListener("click", () => {
+        const currentTheme = document.documentElement.getAttribute("data-theme");
+        const nextTheme = currentTheme === "dark" ? "light" : "dark";
+        document.documentElement.setAttribute("data-theme", nextTheme);
+        themeBtnText.textContent = nextTheme === "dark" ? "라이트" : "다크";
+        store.setTheme(nextTheme);
+        lucide.createIcons();
+      });
+
+      // Filter Event Listeners
+      [searchInput, storeFilter, categoryFilter, statusFilter].forEach(el => {
+        el.addEventListener("input", renderChecklist);
+      });
+
+      // D-Day Calculation
+      function renderDDay() {
+        const targetDate = new Date("2026-09-04T00:00:00");
+        const today = new Date(); // Simulating runtime date or live system date
+        const diffTime = targetDate - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const dDayText = diffDays > 0 ? `D-${diffDays}` : diffDays === 0 ? "D-Day" : `D+${Math.abs(diffDays)}`;
+        document.getElementById("dDayBadge").innerHTML = `<i data-lucide="calendar"></i> ${dDayText} [행사 09.04 오픈]`;
+      }
+
+      // Dashboard KPI Calculation
+      function renderDashboard() {
+        const items = store.getItems();
+        const total = items.length;
+
+        const completed = items.filter(i => i.status === "completed").length;
+        const inProgress = items.filter(i => i.status === "in_progress").length;
+        const pending = items.filter(i => i.status === "pending").length;
+
+        const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+        document.getElementById("totalProgressPercent").textContent = `${percent}%`;
+        const totalProgressBar = document.getElementById("totalProgressBar");
+        totalProgressBar.style.width = `${percent}%`;
+
+        document.getElementById("countCompleted").textContent = completed;
+        document.getElementById("countProgress").textContent = inProgress;
+        document.getElementById("countPending").textContent = pending;
+        document.getElementById("countTotal").textContent = total;
+
+        // Store Progress Calculation
+        ['central', 'river', 'park'].forEach(storeKey => {
+          const storeChecked = items.filter(i => i.storeStatus && i.storeStatus[storeKey]).length;
+          const storePercent = total > 0 ? Math.round((storeChecked / total) * 100) : 0;
+          document.getElementById(`${storeKey}Percent`).textContent = `${storePercent}%`;
+          document.getElementById(`${storeKey}Bar`).style.width = `${storePercent}%`;
+        });
+
+        // Budget Alert status
+        const spent = store.state.budgetSpent || 4800000;
+        document.getElementById("budgetSpentText").textContent = spent.toLocaleString();
+        const budgetPercent = Math.round((spent / 8000000) * 100);
+        document.getElementById("budgetProgressBar").style.width = `${budgetPercent}%`;
+      }
+
+      // Render Main Checklist
+      function renderChecklist() {
+        const items = store.getItems();
+        const searchVal = searchInput.value.toLowerCase().trim();
+        const storeVal = storeFilter.value;
+        const catVal = categoryFilter.value;
+        const statusVal = statusFilter.value;
+
+        // Filter Logic
+        const filtered = items.filter(item => {
+          // Category filter
+          if (catVal !== "all" && item.category !== catVal) return false;
+          // Status filter
+          if (statusVal !== "all" && item.status !== statusVal) return false;
+          // Store filter
+          if (storeVal !== "all" && item.storeStatus && !item.storeStatus[storeVal]) return false;
+          // Search filter
+          if (searchVal) {
+            const matchesTitle = item.title.toLowerCase().includes(searchVal);
+            const matchesDesc = item.description.toLowerCase().includes(searchVal);
+            const matchesDept = item.department.toLowerCase().includes(searchVal);
+            const matchesMemo = (item.memo || "").toLowerCase().includes(searchVal);
+            if (!matchesTitle && !matchesDesc && !matchesDept && !matchesMemo) return false;
+          }
+          return true;
+        });
+
+        // Group by Category
+        const categories = [
+          { key: "VMD", name: "1. 점포별 진열 위치 및 VMD 부문" },
+          { key: "SCM", name: "2. 협력사 공급망(SCM) 및 재고 부문" },
+          { key: "POS", name: "3. POS 시스템 및 예산 관리 부문" },
+          { key: "CS", name: "4. 직원 배치 및 교육 / 고객 FAQ 부문" }
+        ];
+
+        checklistContainer.innerHTML = "";
+
+        if (filtered.length === 0) {
+          checklistContainer.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: var(--text-muted); background: var(--bg-card); border-radius: 12px; border: 1px solid var(--bg-card-border);">
+              <i data-lucide="file-x" style="width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.5;"></i>
+              <p style="font-size: 1rem; font-weight: 600;">조건에 일치하는 점검 항목이 없습니다.</p>
+            </div>
+          `;
+          lucide.createIcons();
+          return;
+        }
+
+        categories.forEach(cat => {
+          const categoryItems = filtered.filter(i => i.category === cat.key);
+          if (categoryItems.length === 0) return;
+
+          const completedCount = categoryItems.filter(i => i.status === "completed").length;
+          const catProgress = Math.round((completedCount / categoryItems.length) * 100);
+
+          const catBlock = document.createElement("div");
+          catBlock.className = "category-block";
+
+          catBlock.innerHTML = `
+            <div class="category-header">
+              <div class="category-title">
+                <i data-lucide="folder-check"></i> ${cat.name} (${categoryItems.length}건)
+              </div>
+              <div class="category-progress">카테고리 달성률: ${catProgress}%</div>
+            </div>
+            <div class="checklist-grid" id="grid-${cat.key}"></div>
+          `;
+
+          checklistContainer.appendChild(catBlock);
+
+          const gridEl = catBlock.querySelector(`#grid-${cat.key}`);
+
+          categoryItems.forEach(item => {
+            const card = document.createElement("div");
+            card.className = "item-card";
+
+            // Status Badge Config
+            let statusBtnClass = "status-pending-bg";
+            let statusText = "대기";
+            let statusIcon = "minus";
+
+            if (item.status === "completed") {
+              statusBtnClass = "status-completed-bg";
+              statusText = "완료";
+              statusIcon = "check";
+            } else if (item.status === "in_progress") {
+              statusBtnClass = "status-progress-bg";
+              statusText = "진행중";
+              statusIcon = "clock";
+            }
+
+            const formattedDate = new Date(item.updatedAt).toLocaleDateString("ko-KR", {
+              month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
+            });
+
+            card.innerHTML = `
+              <div class="item-card-top">
+                <div class="item-meta">
+                  <span class="item-no">No.${item.no || '-'}</span>
+                  <span class="item-dept">${item.department}</span>
+                  <span class="item-deadline"><i data-lucide="calendar-clock" style="width: 14px;"></i> ~${item.deadline || '상시'}</span>
+                </div>
+                <button class="item-status-btn ${statusBtnClass}" data-id="${item.id}" title="상태 변경 클릭">
+                  <i data-lucide="${statusIcon}" style="width: 14px;"></i> ${statusText}
+                </button>
+              </div>
+
+              <div class="item-title">${item.title}</div>
+              <div class="item-desc">${item.description}</div>
+
+              <!-- Store Specific Checkboxes -->
+              <div class="store-checks">
+                <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted); display: flex; align-items: center; gap: 4px;">
+                  <i data-lucide="building-2" style="width: 14px;"></i> 점포별 현장 체크:
+                </span>
+                <label class="store-check-label">
+                  <input type="checkbox" class="store-cb" data-id="${item.id}" data-store="central" ${item.storeStatus?.central ? 'checked' : ''}> 센트럴점
+                </label>
+                <label class="store-check-label">
+                  <input type="checkbox" class="store-cb" data-id="${item.id}" data-store="river" ${item.storeStatus?.river ? 'checked' : ''}> 리버점
+                </label>
+                <label class="store-check-label">
+                  <input type="checkbox" class="store-cb" data-id="${item.id}" data-store="park" ${item.storeStatus?.park ? 'checked' : ''}> 파크점
+                </label>
+              </div>
+
+              <!-- Memo Input -->
+              <div class="memo-wrapper">
+                <input type="text" class="memo-input" data-id="${item.id}" value="${item.memo || ''}" placeholder="현장 실시간 메모 입력 (자동 저장)...">
+              </div>
+
+              <div class="item-footer">
+                <span>최종 수정: ${formattedDate}</span>
+                <div class="item-actions-right">
+                  <button class="btn btn-outline edit-item-btn" data-id="${item.id}" style="padding: 2px 8px; font-size: 0.75rem;">
+                    <i data-lucide="edit-3" style="width: 12px;"></i> 수정
+                  </button>
+                  ${item.isCustom ? `
+                    <button class="btn btn-outline delete-item-btn" data-id="${item.id}" style="padding: 2px 8px; font-size: 0.75rem; color: var(--status-danger);">
+                      <i data-lucide="trash-2" style="width: 12px;"></i> 삭제
+                    </button>
+                  ` : ''}
+                </div>
+              </div>
+            `;
+
+            gridEl.appendChild(card);
+          });
+        });
+
+        lucide.createIcons();
+        attachItemEventListeners();
+      }
+
+      // Attach Event Listeners for Dynamic Items
+      function attachItemEventListeners() {
+        // Status Toggle Event
+        document.querySelectorAll(".item-status-btn").forEach(btn => {
+          btn.addEventListener("click", (e) => {
+            const id = e.currentTarget.getAttribute("data-id");
+            const items = store.getItems();
+            const item = items.find(i => i.id === id);
+            if (!item) return;
+
+            const nextStatus = {
+              "pending": "in_progress",
+              "in_progress": "completed",
+              "completed": "pending"
+            }[item.status] || "pending";
+
+            store.updateItem(id, { status: nextStatus });
+            renderDashboard();
+            renderChecklist();
+          });
+        });
+
+        // Store Checkbox Event
+        document.querySelectorAll(".store-cb").forEach(cb => {
+          cb.addEventListener("change", (e) => {
+            const id = e.target.getAttribute("data-id");
+            const storeKey = e.target.getAttribute("data-store");
+            const items = store.getItems();
+            const item = items.find(i => i.id === id);
+            if (!item) return;
+
+            const updatedStoreStatus = {
+              ...(item.storeStatus || { central: false, river: false, park: false }),
+              [storeKey]: e.target.checked
+            };
+
+            // Auto status update if all stores checked
+            let updatedStatus = item.status;
+            const allChecked = Object.values(updatedStoreStatus).every(Boolean);
+            if (allChecked) updatedStatus = "completed";
+
+            store.updateItem(id, {
+              storeStatus: updatedStoreStatus,
+              status: updatedStatus
+            });
+            renderDashboard();
+          });
+        });
+
+        // Memo Blur Event (Auto Save)
+        document.querySelectorAll(".memo-input").forEach(input => {
+          input.addEventListener("change", (e) => {
+            const id = e.target.getAttribute("data-id");
+            const memoVal = e.target.value.trim();
+            store.updateItem(id, { memo: memoVal });
+          });
+        });
+
+        // Edit Item Event
+        document.querySelectorAll(".edit-item-btn").forEach(btn => {
+          btn.addEventListener("click", (e) => {
+            const id = e.currentTarget.getAttribute("data-id");
+            const items = store.getItems();
+            const item = items.find(i => i.id === id);
+            if (!item) return;
+
+            document.getElementById("editItemId").value = item.id;
+            document.getElementById("formCategory").value = item.category;
+            document.getElementById("formTitle").value = item.title;
+            document.getElementById("formDescription").value = item.description;
+            document.getElementById("formDepartment").value = item.department;
+            document.getElementById("formDeadline").value = item.deadline;
+
+            document.getElementById("itemModalTitle").innerHTML = `<i data-lucide="edit"></i> 점검 항목 수정`;
+            itemModal.classList.add("active");
+            lucide.createIcons();
+          });
+        });
+
+        // Delete Item Event (Custom Items Only)
+        document.querySelectorAll(".delete-item-btn").forEach(btn => {
+          btn.addEventListener("click", (e) => {
+            const id = e.currentTarget.getAttribute("data-id");
+            if (confirm("해당 커스텀 점검 항목을 삭제하시겠습니까?")) {
+              store.deleteItem(id);
+              renderDashboard();
+              renderChecklist();
+            }
+          });
+        });
+      }
+
+      // Modals Logic
+      openRiskModalBtn.addEventListener("click", () => {
+        complianceCheck.checked = store.state.complianceAgreed;
+        riskModal.classList.add("active");
+      });
+
+      closeRiskModalBtn.addEventListener("click", () => riskModal.classList.remove("active"));
+      saveComplianceBtn.addEventListener("click", () => {
+        store.setCompliance(complianceCheck.checked);
+        riskModal.classList.remove("active");
+      });
+
+      // Modal Tabs
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+          document.querySelectorAll(".tab-content").forEach(c => c.style.display = "none");
+
+          e.target.classList.add("active");
+          const targetTab = e.target.getAttribute("data-tab");
+          document.getElementById(targetTab).style.display = "block";
+        });
+      });
+
+      // Item Modal Logic
+      addItemBtn.addEventListener("click", () => {
+        itemForm.reset();
+        document.getElementById("editItemId").value = "";
+        document.getElementById("itemModalTitle").innerHTML = `<i data-lucide="plus-circle"></i> 신규 점검 항목 추가`;
+        itemModal.classList.add("active");
+        lucide.createIcons();
+      });
+
+      closeItemModalBtn.addEventListener("click", () => itemModal.classList.remove("active"));
+      cancelItemBtn.addEventListener("click", () => itemModal.classList.remove("active"));
+
+      itemForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const editId = document.getElementById("editItemId").value;
+        const category = document.getElementById("formCategory").value;
+        const title = document.getElementById("formTitle").value.trim();
+        const description = document.getElementById("formDescription").value.trim();
+        const department = document.getElementById("formDepartment").value.trim() || "현장관리팀";
+        const deadline = document.getElementById("formDeadline").value || "2026-09-04";
+
+        const catNames = {
+          "VMD": "점포별 진열 위치 및 VMD 부문",
+          "SCM": "협력사 공급망(SCM) 및 재고 부문",
+          "POS": "POS 시스템 및 예산 관리 부문",
+          "CS": "직원 배치 및 교육 / 고객 FAQ 부문"
+        };
+
+        if (editId) {
+          store.updateItem(editId, {
+            category,
+            categoryName: catNames[category],
+            title,
+            description,
+            department,
+            deadline
+          });
+        } else {
+          const newItem = {
+            id: `CHK-CUSTOM-${Date.now()}`,
+            category,
+            categoryName: catNames[category],
+            no: store.getItems().length + 1,
+            title,
+            description,
+            department,
+            deadline,
+            status: "pending",
+            storeStatus: { central: false, river: false, park: false },
+            memo: "",
+            updatedAt: new Date().toISOString(),
+            isCustom: true
+          };
+          store.addItem(newItem);
+        }
+
+        itemModal.classList.remove("active");
+        renderDashboard();
+        renderChecklist();
+      });
+
+      // Print Button
+      printBtn.addEventListener("click", () => window.print());
+
+      // Export JSON
+      exportJsonBtn.addEventListener("click", exportBackupData);
+      backupBtn.addEventListener("click", exportBackupData);
+
+      function exportBackupData() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(store.state, null, 2));
+        const downloadAnchor = document.createElement("a");
+        const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", `checklist_backup_${dateStr}.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+      }
+
+      // Import JSON
+      importJsonInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const importedData = JSON.parse(event.target.result);
+            if (importedData.items && Array.isArray(importedData.items)) {
+              store.state = importedData;
+              store.saveState();
+              renderDashboard();
+              renderChecklist();
+              alert("성공적으로 체크리스트 데이터를 복원하였습니다.");
+            } else {
+              alert("올바르지 않은 백업 파일 형식입니다.");
+            }
+          } catch (err) {
+            alert("JSON 파일 파싱 중 오류가 발생했습니다.");
+          }
+        };
+        reader.readAsText(file);
+      });
+
+      // Reset Data
+      resetDataBtn.addEventListener("click", () => {
+        if (confirm("모든 현장 점검 기록 및 메모를 초기화하고 기본 14개 항목으로 복원하시겠습니까?")) {
+          store.resetToDefault();
+          renderDashboard();
+          renderChecklist();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
